@@ -17,16 +17,25 @@ export async function signup(
   email: string,
   password: string,
 ): Promise<ApiResponse<AuthResponse>> {
-  const response = await apiRequest<AuthResponse>("/auth/signup", {
+  const response = await fetch("http://localhost:5000/api/auth/signup", {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify({ username, email, password }),
   });
 
-  if (response.data.jwtToken) {
-    localStorage.setItem("token", response.data.jwtToken);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "An error occurred");
   }
 
-  return response;
+  if (data.data?.jwtToken) {
+    localStorage.setItem("token", data.data.jwtToken);
+  }
+
+  return data;
 }
 
 export async function signin(

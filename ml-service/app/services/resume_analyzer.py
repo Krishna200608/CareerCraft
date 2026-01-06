@@ -12,6 +12,13 @@ class ExperienceEntry(TypedDict):
     duration: Optional[str]
     description: str
 
+class ProjectEntry(TypedDict):
+    title: Optional[str]
+    date: Optional[str]          # single date (month/year or year)
+    duration: Optional[str]      # only if real range exists
+    tech_stack: list[str]
+    description: str
+
 
 SECTION_HEADERS = {
     "skills": "SKILLS",
@@ -65,6 +72,18 @@ DURATION_PATTERN = re.compile(
         \s*
         (?:\d{4}|Present|present)
     )
+    """,
+    re.IGNORECASE | re.VERBOSE
+)
+
+SINGLE_DATE_PATTERN = re.compile(
+    r"""
+    ^
+    (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|
+       January|February|March|April|June|July|August|September|
+       October|November|December)?
+    \s*\d{4}
+    $
     """,
     re.IGNORECASE | re.VERBOSE
 )
@@ -243,6 +262,107 @@ def extract_experience(experience_text: str) -> list[ExperienceEntry]:
     return entries
 
 
+def extract_tech_stack(line: str) -> list[str]:
+    if not line.lower().startswith("tech"):
+        return []
+
+    normalized = normalize(line)
+    found = []
+
+    for skill in SKILL_VOCAB:
+        # avoid single-letter skills unless standalone
+        if len(skill) == 1:
+            if f" {skill} " not in f" {normalized} ":
+                continue
+
+        if normalize(skill) in normalized:
+            found.append(skill)
+
+    return sorted(set(found))
+
+def is_title_candidate(line: str) -> bool:
+    words = line.split()
+
+    # length constraint
+    if len(words) > 10:
+        return False
+
+    lower = line.lower().strip()
+
+    # never treat tech lines as title
+    if lower.startswith("tech"):
+        return False
+
+    # never treat dates as titles
+    if DURATION_PATTERN.search(line):
+        return False
+
+    if SINGLE_DATE_PATTERN.match(line):
+        return False
+
+    # sentence-like
+    if line.endswith("."):
+        return False
+
+    return True
+
+
+def extract_projects(projects_text: str) -> list[ProjectEntry]:
+    if not projects_text:
+        return []
+
+    lines = preprocess_lines(projects_text)
+
+    projects: list[ProjectEntry] = []
+    current: Optional[ProjectEntry] = None
+
+    def flush():
+        nonlocal current
+        if current and current["title"]:
+            current["description"] = current["description"].strip()
+            projects.append(current)
+        current = None
+
+    for line in lines:
+        # -------- TITLE BOUNDARY --------
+        if is_title_candidate(line):
+            if current is None or current["description"]:
+                flush()
+                current = {
+                    "title": line.replace("Github", "").strip(),
+                    "date": None,
+                    "duration": None,
+                    "tech_stack": [],
+                    "description": ""
+                }
+                continue
+
+        if current is None:
+            continue
+
+        # -------- DURATION (range only) --------
+        dur = DURATION_PATTERN.search(line)
+        if dur:
+            current["duration"] = f"{dur.group(1)} - {dur.group(2)}"
+            continue
+
+        # -------- SINGLE DATE --------
+        if SINGLE_DATE_PATTERN.match(line):
+            current["date"] = line.strip()
+            continue
+
+        # -------- TECH STACK --------
+        if line.lower().startswith("tech"):
+            current["tech_stack"] = extract_tech_stack(line)
+            continue
+
+        # -------- DESCRIPTION --------
+        current["description"] += line + " "
+
+    flush()
+    return projects
+
+
 def get_analysis(content: str):
 
     sections_present = detect_sections(content)
@@ -252,6 +372,7 @@ def get_analysis(content: str):
 
     education = extract_education(raw_sections.get("education", ""))
     experience = extract_experience(raw_sections.get("experience", ""))
+    projects = extract_projects(raw_sections.get("projects", ""))
 
 
     return {
@@ -259,5 +380,6 @@ def get_analysis(content: str):
         "raw_sections": raw_sections,
         "skills": skills,
         "education": education,
-        "experience": experience
+        "experience": experience,
+        "projects": projects,
     }

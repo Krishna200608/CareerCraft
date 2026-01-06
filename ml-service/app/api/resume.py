@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from app.services.resume_parser import extract_textpdf, extract_textdocs
 from app.services.resume_analyzer import get_analysis
+from app.services.ats_scorer import compute_ats_score
 
 router = APIRouter()
 
@@ -47,11 +48,15 @@ async def extract_text(file: UploadFile = File(...)):
 @router.post("/analyze")
 async def analyze_text(request: ResumeAnalyzeRequest):
     try:
-        analysis = get_analysis(request.content)
+        content = request.content
+
+        analysis = get_analysis(content)
+        ats = compute_ats_score(analysis, content)
         
         return {
             "content": request.content,
-            **analysis
+            **analysis,
+            **ats
         }
 
         

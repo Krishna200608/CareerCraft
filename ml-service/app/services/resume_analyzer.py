@@ -13,7 +13,6 @@ SECTION_HEADERS = {
 }
 
 
-
 def detect_sections(text: str) -> dict:
     upper = text.upper()
     return {
@@ -60,7 +59,6 @@ def get_analysis(content: str):
     education = extract_education(raw_sections.get("education", ""))
     experience = extract_experience(raw_sections.get("experience", ""))
     projects = extract_projects(raw_sections.get("projects", ""))
-
 
     return {
         "sections": sections_present,

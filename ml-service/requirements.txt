@@ -7,3 +7,6 @@ python-docs
 python-docx
 scikit-learn
 textstat
+spacy
+sentence-transformers
+numpy

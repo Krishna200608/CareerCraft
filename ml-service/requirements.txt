@@ -10,3 +10,5 @@ textstat
 spacy
 sentence-transformers
 numpy
+requests
+pymupdf

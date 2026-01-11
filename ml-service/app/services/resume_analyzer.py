@@ -2,6 +2,7 @@ from app.services.skill_extractor import extract_skills_from_section
 from app.services.education_extractor import extract_education
 from app.services.experience_extractor import extract_experience
 from app.services.project_extractor import extract_projects
+import re
 
 SECTION_HEADERS = {
     "skills": "SKILLS",
@@ -55,6 +56,9 @@ def get_analysis(content: str):
     raw_sections = extract_raw_sections(content)
 
     skills = extract_skills_from_section(raw_sections.get("skills", ""))
+    # Fallback: if no skills found in dedicated section, scan full content
+    if not skills:
+        skills = extract_skills_from_section(content)
 
     education = extract_education(raw_sections.get("education", ""))
     experience = extract_experience(raw_sections.get("experience", ""))

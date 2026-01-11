@@ -20,6 +20,9 @@ export default function Navbar() {
             <Link href="/" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
               Home
             </Link>
+            <Link href="/resume-analysis" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+              Resume Analysis
+            </Link>
             <Link href="/resume-upload" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
               Upload Resume
             </Link>
@@ -79,6 +82,9 @@ export default function Navbar() {
             <div className="space-y-2 border-t border-zinc-200 py-4 dark:border-zinc-800">
               <Link href="/" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
                 Home
+              </Link>
+              <Link href="/resume-analysis" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+                Resume Analysis
               </Link>
               <Link href="/resume-upload" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
                 Upload Resume

@@ -24,6 +24,8 @@ def score_section_completeness(analysis: dict) -> float:
 
     return score
 
+    return score
+
 # --- SKILLS ---
 def score_skill_count(skills: list[str]) -> float:
     n = len(skills)

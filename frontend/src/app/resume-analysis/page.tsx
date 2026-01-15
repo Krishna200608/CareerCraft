@@ -1,9 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { JobMatchCard } from "@/components/JobMatchCard";
 
 const ML_BASE_URL =
   process.env.NEXT_PUBLIC_ML_SERVICE_URL || "http://localhost:8001";
+
+interface JobMatchResult {
+  match_percentage?: number;
+  matched_skills?: string[];
+  missing_skills?: string[];
+  recommendations?: string[];
+}
 
 interface AnalysisResult {
   ats_score?: number;
@@ -17,6 +25,7 @@ interface AnalysisResult {
   structure_score?: number;
   missing_keywords?: string[];
   feedback?: string[];
+  job_match?: JobMatchResult;
 }
 
 interface ExtractResponse {
@@ -370,6 +379,10 @@ export default function ResumeAnalysisPage() {
                     Upload a resume and run analysis to see ATS score, skills, and feedback here.
                   </p>
                 </div>
+              )}
+
+              {!isLoading && analysis?.job_match && (
+                <JobMatchCard data={analysis.job_match} />
               )}
             </div>
           </div>

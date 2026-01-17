@@ -1,10 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { isAuthenticated, logout } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+    router.push("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-black/60">
@@ -29,24 +43,40 @@ export default function Navbar() {
             <Link href="/cover-letter" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
               Get Cover Letter
             </Link>
+            {isLoggedIn && (
+              <Link href="/my-cover-letters" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+                My Cover Letters
+              </Link>
+            )}
             <Link href="/about" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
               About
             </Link>
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <Link
-              href="/signin"
-              className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/signup"
-              className="inline-flex items-center rounded-md bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow hover:bg-blue-700"
-            >
-              Sign up
-            </Link>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+              >
+                Sign out
+              </button>
+            ) : (
+              <>
+                <Link
+                  href="/signin"
+                  className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center rounded-md bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow hover:bg-blue-700"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -92,22 +122,38 @@ export default function Navbar() {
               <Link href="/cover-letter" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
                 Get Cover Letter
               </Link>
+              {isLoggedIn && (
+                <Link href="/my-cover-letters" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
+                  My Cover Letters
+                </Link>
+              )}
               <Link href="/about" className="block px-1 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
                 About
               </Link>
               <div className="flex items-center gap-3 pt-2">
-                <Link
-                  href="/signin"
-                  className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center rounded-md bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow hover:bg-blue-700"
-                >
-                  Sign up
-                </Link>
+                {isLoggedIn ? (
+                  <button
+                    onClick={handleLogout}
+                    className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                  >
+                    Sign out
+                  </button>
+                ) : (
+                  <>
+                    <Link
+                      href="/signin"
+                      className="inline-flex items-center rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="inline-flex items-center rounded-md bg-blue-600 px-3.5 py-1.5 text-sm font-semibold text-white shadow hover:bg-blue-700"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

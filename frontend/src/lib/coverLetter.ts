@@ -56,7 +56,7 @@ export async function analyzeResume(resumeText: string): Promise<ResumeAnalysisR
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ resume_text: resumeText }),
+      body: JSON.stringify({ content: resumeText }),
     });
 
     if (!response.ok) {
@@ -98,7 +98,7 @@ export async function uploadResume(file: File): Promise<{ text: string }> {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${ML_SERVICE_URL}/resume/extract`, {
+    const response = await fetch(`${ML_SERVICE_URL}/resume/extract-text`, {
       method: 'POST',
       body: formData,
     });

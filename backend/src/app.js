@@ -4,16 +4,17 @@ import authRoutes from "./routes/auth.routes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import resumeRoutes from "./routes/resume.routes.js";
+import coverLetterRoutes from "./routes/coverLetter.routes.js";
 import multer from "multer";
 const app = express();
 
 
 
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }));
 
 app.use(express.json({ limit: "16kb" }));
@@ -33,6 +34,9 @@ app.use((req, res, next) => {
 //-----resume routes
 app.use("/api/resumes", resumeRoutes);
 
+//-----cover letter routes
+app.use("/api/cover-letters", coverLetterRoutes);
+
 //-----health and auth routes   
 app.use("/api/health", healthRoutes);
 console.log(' MOUNTING AUTH ROUTES...');
@@ -41,8 +45,8 @@ console.log(' AUTH ROUTES MOUNTED at /api/auth');
 
 // Test endpoint to verify server is working
 app.get("/api/test", (req, res) => {
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: "Server is working!",
     timestamp: new Date().toISOString()
   });
@@ -50,8 +54,8 @@ app.get("/api/test", (req, res) => {
 
 // Simple auth test route
 app.get("/api/auth-test", (req, res) => {
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: "Auth routes are working!",
     timestamp: new Date().toISOString()
   });
@@ -61,8 +65,8 @@ app.get("/api/auth-test", (req, res) => {
 app.post("/api/auth-test", (req, res) => {
   console.log(' AUTH TEST CONTROLLER HIT');
   console.log(' Request body:', req.body);
-  res.json({ 
-    success: true, 
+  res.json({
+    success: true,
     message: "Auth controller test working!",
     timestamp: new Date().toISOString()
   });
@@ -73,9 +77,9 @@ app.use((err, req, res, next) => {
   if (!err) {
     return next(); // Pass through if no error
   }
-  
+
   console.error(' Express error handler:', err);
-  
+
   if (err instanceof multer.MulterError) {
     console.error(' Multer error:', err);
     return res.status(400).json({

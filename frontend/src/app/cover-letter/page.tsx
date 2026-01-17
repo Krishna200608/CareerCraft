@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { analyzeResume, generateCoverLetter, uploadResume, ResumeAnalysisResponse, CoverLetterResponse } from '@/lib/coverLetter';
+import { isAuthenticated } from '@/lib/auth';
+import { saveCoverLetter } from '@/lib/coverLetterApi';
 
 interface JobDetails {
   companyName: string;
@@ -24,6 +26,44 @@ export default function CoverLetterPage() {
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState<CoverLetterResponse | null>(null);
   const [loading, setLoading] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [saveLoading, setSaveLoading] = useState<boolean>(false);
+  const [saveSuccess, setSaveSuccess] = useState<string>('');
+
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated());
+  }, []);
+
+  const handleSaveCoverLetter = async () => {
+    if (!generatedCoverLetter || isSaved) return;
+
+    setSaveLoading(true);
+    setError('');
+    setSaveSuccess('');
+
+    try {
+      await saveCoverLetter({
+        companyName: generatedCoverLetter.company_name,
+        jobTitle: generatedCoverLetter.job_title,
+        jobDescription: jobDetails.jobDescription,
+        tone: jobDetails.tone,
+        coverLetter: {
+          greeting: generatedCoverLetter.cover_letter.greeting,
+          body: generatedCoverLetter.cover_letter.body,
+          closing: generatedCoverLetter.cover_letter.closing,
+          signOff: generatedCoverLetter.cover_letter.sign_off,
+          candidateName: generatedCoverLetter.cover_letter.candidate_name,
+        },
+      });
+      setIsSaved(true);
+      setSaveSuccess('Cover letter saved successfully!');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save cover letter');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -209,6 +249,12 @@ ${coverLetter.sign_off}`;
           </div>
         )}
 
+        {saveSuccess && (
+          <div className="mb-6 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-900/30 dark:text-green-200">
+            {saveSuccess}
+          </div>
+        )}
+
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Left Column - Resume Upload Only */}
           <div className="space-y-6">
@@ -217,7 +263,7 @@ ${coverLetter.sign_off}`;
               <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
                 Upload Resume
               </h2>
-              
+
               <div className="border-2 border-dashed border-zinc-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors dark:border-zinc-700">
                 <input
                   type="file"
@@ -274,7 +320,7 @@ ${coverLetter.sign_off}`;
                   <input
                     type="text"
                     value={jobDetails.companyName}
-                    onChange={(e) => setJobDetails({...jobDetails, companyName: e.target.value})}
+                    onChange={(e) => setJobDetails({ ...jobDetails, companyName: e.target.value })}
                     className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                     placeholder="e.g., Microsoft"
                   />
@@ -285,7 +331,7 @@ ${coverLetter.sign_off}`;
                   <input
                     type="text"
                     value={jobDetails.jobTitle}
-                    onChange={(e) => setJobDetails({...jobDetails, jobTitle: e.target.value})}
+                    onChange={(e) => setJobDetails({ ...jobDetails, jobTitle: e.target.value })}
                     className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                     placeholder="e.g., Senior Software Engineer"
                   />
@@ -295,7 +341,7 @@ ${coverLetter.sign_off}`;
                   <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100 mb-1">Job Description</label>
                   <textarea
                     value={jobDetails.jobDescription}
-                    onChange={(e) => setJobDetails({...jobDetails, jobDescription: e.target.value})}
+                    onChange={(e) => setJobDetails({ ...jobDetails, jobDescription: e.target.value })}
                     className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                     rows={4}
                     placeholder="Paste job description here..."
@@ -306,7 +352,7 @@ ${coverLetter.sign_off}`;
                   <label className="block text-sm font-medium text-zinc-800 dark:text-zinc-100 mb-1">Tone</label>
                   <select
                     value={jobDetails.tone}
-                    onChange={(e) => setJobDetails({...jobDetails, tone: e.target.value as 'formal' | 'confident' | 'friendly'})}
+                    onChange={(e) => setJobDetails({ ...jobDetails, tone: e.target.value as 'formal' | 'confident' | 'friendly' })}
                     className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                   >
                     <option value="formal">Formal</option>
@@ -338,18 +384,20 @@ ${coverLetter.sign_off}`;
             <h2 className="text-2xl font-semibold mb-4 text-zinc-900 dark:text-white">
               Resume Analysis
             </h2>
-            
+
             {resumeAnalysis ? (
               <div className="space-y-4">
+                {resumeAnalysis.personal_info && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">Personal Information</h3>
+                    <p className="text-sm text-zinc-700 dark:text-zinc-300">{resumeAnalysis.personal_info.name || 'N/A'} • {resumeAnalysis.personal_info.email || 'N/A'}</p>
+                  </div>
+                )}
+
                 <div>
-                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">Personal Information</h3>
-                  <p className="text-sm text-zinc-700 dark:text-zinc-300">{resumeAnalysis.personal_info.name} • {resumeAnalysis.personal_info.email}</p>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">Skills ({resumeAnalysis.skills.length})</h3>
+                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">Skills ({resumeAnalysis.skills?.length || 0})</h3>
                   <div className="flex flex-wrap gap-2">
-                    {resumeAnalysis.skills.map((skill) => (
+                    {(resumeAnalysis.skills || []).map((skill) => (
                       <span
                         key={skill}
                         className="rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-200"
@@ -359,14 +407,14 @@ ${coverLetter.sign_off}`;
                     ))}
                   </div>
                 </div>
-                
+
                 <div>
-                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">Experience ({resumeAnalysis.experience.length})</h3>
+                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 mb-2">Experience ({resumeAnalysis.experience?.length || 0})</h3>
                   <div className="space-y-2">
-                    {resumeAnalysis.experience.map((exp, index) => (
+                    {(resumeAnalysis.experience || []).map((exp, index) => (
                       <div key={index} className="text-sm text-zinc-700 dark:text-zinc-300">
-                        <p className="font-medium">{exp.position} at {exp.company}</p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">{exp.duration}</p>
+                        <p className="font-medium">{exp.position || exp.title || 'Position'} at {exp.company || 'Company'}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">{exp.duration || ''}</p>
                       </div>
                     ))}
                   </div>
@@ -386,15 +434,29 @@ ${coverLetter.sign_off}`;
                 Generated Cover Letter
               </h2>
               {generatedCoverLetter && (
-                <button
-                  onClick={handleDownloadPDF}
-                  className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Download PDF
-                </button>
+                <div className="flex items-center gap-3">
+                  {isLoggedIn && (
+                    <button
+                      onClick={handleSaveCoverLetter}
+                      disabled={isSaved || saveLoading}
+                      className={`flex items-center px-4 py-2 rounded-lg transition-colors ${isSaved
+                        ? 'bg-green-600 text-white cursor-default'
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60'
+                        }`}
+                    >
+                      {saveLoading ? 'Saving...' : isSaved ? '✓ Saved' : 'Save Cover Letter'}
+                    </button>
+                  )}
+                  <button
+                    onClick={handleDownloadPDF}
+                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Download PDF
+                  </button>
+                </div>
               )}
             </div>
-            
+
             {generatedCoverLetter ? (
               <>
                 <div className="rounded-lg border border-zinc-200 bg-white p-8 dark:border-zinc-700 dark:bg-zinc-900">
@@ -402,28 +464,28 @@ ${coverLetter.sign_off}`;
                     {/* Letter Header */}
                     <div className="mb-8 text-right">
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                        {new Date().toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
+                        {new Date().toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
                         })}
                       </p>
                     </div>
-                    
+
                     {/* Recipient Info */}
                     <div className="mb-6">
                       <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Hiring Manager</p>
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">{generatedCoverLetter.company_name}</p>
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">{generatedCoverLetter.company_name} Headquarters</p>
                     </div>
-                    
+
                     {/* Greeting */}
                     <div className="mb-6">
                       <p className="text-zinc-800 dark:text-zinc-200 font-medium">
                         {generatedCoverLetter.cover_letter.greeting}
                       </p>
                     </div>
-                    
+
                     {/* Letter Body */}
                     <div className="mb-6 space-y-4">
                       {generatedCoverLetter.cover_letter.body.map((paragraph, index) => (
@@ -432,14 +494,14 @@ ${coverLetter.sign_off}`;
                         </p>
                       ))}
                     </div>
-                    
+
                     {/* Closing */}
                     <div className="mb-6">
                       <p className="text-zinc-800 dark:text-zinc-200 font-medium">
                         {generatedCoverLetter.cover_letter.closing}
                       </p>
                     </div>
-                    
+
                     {/* Signature */}
                     <div className="mt-12">
                       <p className="text-zinc-800 dark:text-zinc-200 font-medium">
@@ -448,7 +510,7 @@ ${coverLetter.sign_off}`;
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
                   <p>Company: {generatedCoverLetter.company_name}</p>
                   <p>Job Title: {generatedCoverLetter.job_title}</p>

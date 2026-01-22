@@ -1,101 +1,164 @@
 "use client";
-import { Target, Brain, Users, TrendingUp, ArrowRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Target, Brain, Users, TrendingUp, ArrowRight, FileText, Search, Zap, GraduationCap, Briefcase } from 'lucide-react';
 import './about.css';
 
 export default function AboutPage() {
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const timelineRef = useRef<HTMLDivElement>(null);
+
+    // Scroll progress for timeline
+    useEffect(() => {
+        const handleScroll = () => {
+            if (timelineRef.current) {
+                const rect = timelineRef.current.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                const elementTop = rect.top;
+                const elementHeight = rect.height;
+
+                if (elementTop < windowHeight && elementTop + elementHeight > 0) {
+                    const progress = Math.min(1, Math.max(0, (windowHeight - elementTop) / (windowHeight + elementHeight)));
+                    setScrollProgress(progress * 100);
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Spotlight effect handler
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const card = e.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+    };
+
     return (
-        <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
-            {/* Hero Section */}
-            <section className="relative overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center space-y-4">
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight">
+        <div className="about-page min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50 dark:from-gray-900 dark:via-black dark:to-gray-900 text-gray-900 dark:text-gray-900 dark:text-white relative overflow-hidden">
+
+            {/* ===== HERO SECTION ===== */}
+            <section className="bg-gradient-to-br from-blue-50 via-white to-sky-50 py-20 dark:from-gray-900 dark:via-black dark:to-gray-900">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-3xl text-center">
+                        <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl dark:text-gray-900 dark:text-white">
                             About <span className="text-blue-600">CareerCraft</span>
                         </h1>
-                        <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        <p className="mt-4 text-lg leading-7 text-gray-600 dark:text-gray-300">
                             Empowering careers through intelligent technology and personalized guidance
                         </p>
                     </div>
                 </div>
-
-                <div className="absolute top-0 left-0 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-                <div className="absolute top-0 right-0 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
             </section>
 
-            <section className="py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-5xl mx-auto">
-                    <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-12 space-y-6 border border-gray-100">
-                        <p className="text-lg text-gray-700 leading-relaxed">
-                            <strong className="text-gray-900">CareerCraft</strong> is an AI-powered career assistance platform designed to help individuals build stronger resumes, discover the right job opportunities, and grow professionally with confidence.
-                        </p>
-                        <p className="text-lg text-gray-700 leading-relaxed">
-                            Our goal is to simplify the job-seeking process by combining smart resume analysis, accurate job matching, and personalized career guidance in one unified platform.
-                        </p>
-                        <p className="text-lg text-gray-700 leading-relaxed">
-                            CareerCraft empowers students and professionals to understand their strengths, bridge skill gaps, and present themselves effectively in a competitive job market.
-                        </p>
+            {/* ===== INTRO SECTION ===== */}
+            <section className="relative py-16 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto">
+                    <div
+                        className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card rounded-2xl p-8 sm:p-12 relative"
+                        onMouseMove={handleMouseMove}
+                        style={{ '--mouse-x': '50%', '--mouse-y': '50%' } as React.CSSProperties}
+                    >
+                        <div className="space-y-6 relative z-10">
+                            <p className="text-lg text-gray-600 dark:text-slate-300 leading-relaxed">
+                                <strong className="text-gray-900 dark:text-white font-semibold">CareerCraft</strong> is an AI-powered career assistance platform designed to help individuals build stronger resumes, discover the right job opportunities, and grow professionally with confidence.
+                            </p>
+                            <p className="text-lg text-gray-600 dark:text-slate-300 leading-relaxed">
+                                Our goal is to simplify the job-seeking process by combining smart resume analysis, accurate job matching, and personalized career guidance in one unified platform.
+                            </p>
+                            <p className="text-lg text-gray-600 dark:text-slate-300 leading-relaxed">
+                                CareerCraft empowers students and professionals to understand their strengths, bridge skill gaps, and present themselves effectively in a competitive job market.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section className="py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-12">
-                        What Makes Us <span className="text-blue-600">Different</span>
-                    </h2>
+            {/* Section Divider */}
+            <div className="section-divider max-w-6xl mx-auto" />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        {/* Card 1: Our Mission */}
-                        <div className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 border border-gray-100 hover:border-blue-300 hover:-translate-y-1">
-                            <div className="flex items-start gap-4">
-                                <div className="shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors duration-300">
-                                    <Target className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors duration-300" />
+            {/* ===== WHAT MAKES US DIFFERENT - BENTO GRID ===== */}
+            <section className="py-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="heading-lg text-center mb-4">
+                        <span className="text-gray-900 dark:text-white">What Makes Us </span>
+                        <span className="gradient-text">Different</span>
+                    </h2>
+                    <p className="text-gray-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">
+                        Built with modern AI and designed for the future of work
+                    </p>
+
+                    <div className="bento-grid">
+                        {/* Large Card - Our Mission */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card bento-large rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="flex items-start gap-5">
+                                <div className="shrink-0 w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center glow-icon">
+                                    <Target className="w-7 h-7 text-gray-900 dark:text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">Our Mission</h3>
-                                    <p className="text-gray-600 leading-relaxed">
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Our Mission</h3>
+                                    <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                         To help job-seekers unlock better opportunities through AI-driven insights and career tools.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 border border-gray-100 hover:border-purple-300 hover:-translate-y-1">
-                            <div className="flex items-start gap-4">
-                                <div className="shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-600 transition-colors duration-300">
-                                    <Brain className="w-6 h-6 text-purple-600 group-hover:text-white transition-colors duration-300" />
+                        {/* Large Card - AI-Powered */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card bento-large rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="flex items-start gap-5">
+                                <div className="shrink-0 w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center glow-icon">
+                                    <Brain className="w-7 h-7 text-gray-900 dark:text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">AI-Powered Insights</h3>
-                                    <p className="text-gray-600 leading-relaxed">
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Personalized Analysis</h3>
+                                    <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                         We use modern AI and NLP techniques to analyze resumes, match skills, and generate impactful documents.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 border border-gray-100 hover:border-green-300 hover:-translate-y-1">
-                            <div className="flex items-start gap-4">
-                                <div className="shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-600 transition-colors duration-300">
-                                    <Users className="w-6 h-6 text-green-600 group-hover:text-white transition-colors duration-300" />
+                        {/* Regular Card - User First */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card bento-large rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="flex items-start gap-5">
+                                <div className="shrink-0 w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center glow-icon">
+                                    <Users className="w-7 h-7 text-gray-900 dark:text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">User-First Design</h3>
-                                    <p className="text-gray-600 leading-relaxed">
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">User-First Design</h3>
+                                    <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                         CareerCraft is built with simplicity and clarity, ensuring an intuitive experience for every user.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="group bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 border border-gray-100 hover:border-indigo-300 hover:-translate-y-1">
-                            <div className="flex items-start gap-4">
-                                <div className="shrink-0 w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-600 transition-colors duration-300">
-                                    <TrendingUp className="w-6 h-6 text-indigo-600 group-hover:text-white transition-colors duration-300" />
+                        {/* Regular Card - Career Growth */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card bento-large rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="flex items-start gap-5">
+                                <div className="shrink-0 w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center glow-icon">
+                                    <TrendingUp className="w-7 h-7 text-gray-900 dark:text-white" />
                                 </div>
                                 <div className="flex-1">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-3">Career Growth</h3>
-                                    <p className="text-gray-600 leading-relaxed">
+                                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Career Growth</h3>
+                                    <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                         From resume optimization to skill improvement, we support continuous learning and growth.
                                     </p>
                                 </div>
@@ -105,87 +168,94 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Product Preview Section */}
-            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-sky-50">
-                <div className="max-w-7xl mx-auto">
+            {/* Section Divider */}
+            <div className="section-divider max-w-6xl mx-auto" />
+
+            {/* ===== PRODUCT PREVIEW ===== */}
+            <section className="py-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                            Product <span className="text-blue-600">Preview</span>
+                        <h2 className="heading-lg mb-4">
+                            <span className="text-gray-900 dark:text-white">Product </span>
+                            <span className="gradient-text">Preview</span>
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
                             Experience the power of AI-driven career tools designed to elevate your professional journey
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Resume Analysis Feature */}
-                        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
-                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Resume Analysis */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-5 glow-icon">
+                                <FileText className="w-6 h-6 text-gray-900 dark:text-white" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Resume Analysis</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Resume Analysis</h3>
+                            <p className="text-gray-600 dark:text-slate-400 mb-5 text-sm leading-relaxed">
                                 Get instant feedback on your resume with ATS compatibility checks, keyword optimization, and formatting suggestions.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-600">
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> ATS Score Rating
+                            <ul className="space-y-2.5 text-sm">
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full" /> ATS Score Rating
                                 </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> Keyword Analysis
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full" /> Keyword Analysis
                                 </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> Actionable Suggestions
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full" /> Actionable Suggestions
                                 </li>
                             </ul>
                         </div>
 
-                        {/* Job Matching Feature */}
-                        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
-                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                        {/* Job Matching */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-xl flex items-center justify-center mb-5 glow-icon">
+                                <Search className="w-6 h-6 text-gray-900 dark:text-white" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Job Matching</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Job Matching</h3>
+                            <p className="text-gray-600 dark:text-slate-400 mb-5 text-sm leading-relaxed">
                                 Discover opportunities that align with your skills, experience, and career goals using our intelligent matching algorithm.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-600">
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> Skill-based Matching
+                            <ul className="space-y-2.5 text-sm">
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" /> Skill-based Matching
                                 </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> Compatibility Scores
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" /> Compatibility Scores
                                 </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> Gap Analysis
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" /> Gap Analysis
                                 </li>
                             </ul>
                         </div>
 
-                        {/* Cover Letter Generator Feature */}
-                        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-1">
-                            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
+                        {/* Cover Letter Generator */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center mb-5 glow-icon">
+                                <Zap className="w-6 h-6 text-gray-900 dark:text-white" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Cover Letter Generator</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Cover Letter Generator</h3>
+                            <p className="text-gray-600 dark:text-slate-400 mb-5 text-sm leading-relaxed">
                                 Create personalized, professional cover letters tailored to specific job descriptions in seconds.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-600">
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> AI-Powered Generation
+                            <ul className="space-y-2.5 text-sm">
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> AI-Powered Generation
                                 </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> Customizable Templates
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> Customizable Templates
                                 </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="text-green-500">✓</span> Save & Manage
+                                <li className="flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                                    <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" /> Save & Manage
                                 </li>
                             </ul>
                         </div>
@@ -193,49 +263,55 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Designed For Section */}
-            <section className="py-16 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
+            {/* Section Divider */}
+            <div className="section-divider max-w-6xl mx-auto" />
+
+            {/* ===== DESIGNED FOR ===== */}
+            <section className="py-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                            Designed <span className="text-blue-600">For</span>
+                        <h2 className="heading-lg mb-4">
+                            <span className="text-gray-900 dark:text-white">Designed </span>
+                            <span className="gradient-text">For</span>
                         </h2>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="text-lg text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
                             CareerCraft serves diverse audiences at every stage of their career journey
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Students & Recent Graduates */}
-                        <div className="bg-gradient-to-br from-blue-50 to-sky-50 rounded-2xl p-8 border border-blue-100 hover:shadow-xl transition-all hover:-translate-y-1">
-                            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-6">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Students */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card accent-border-blue rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="w-14 h-14 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center mb-5">
+                                <GraduationCap className="w-7 h-7 text-blue-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-3">Students & Recent Graduates</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Students & Recent Graduates</h3>
+                            <p className="text-gray-600 dark:text-slate-400 mb-5 text-sm leading-relaxed">
                                 Build your first professional resume, understand industry expectations, and prepare for your career launch with confidence.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-700">
+                            <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-300">
                                 <li>• Resume templates optimized for entry-level roles</li>
                                 <li>• Career guidance and skill recommendations</li>
                                 <li>• Interview preparation resources</li>
                             </ul>
                         </div>
 
-                        {/* Working Professionals */}
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-100 hover:shadow-xl transition-all hover:-translate-y-1">
-                            <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-6">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
+                        {/* Professionals */}
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card accent-border-green rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="w-14 h-14 bg-emerald-500/20 border border-emerald-500/30 rounded-xl flex items-center justify-center mb-5">
+                                <Briefcase className="w-7 h-7 text-emerald-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-3">Working Professionals</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Working Professionals</h3>
+                            <p className="text-gray-600 dark:text-slate-400 mb-5 text-sm leading-relaxed">
                                 Advance your career by optimizing your resume, discovering better opportunities, and staying competitive in your field.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-700">
+                            <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-300">
                                 <li>• Mid-level to senior resume optimization</li>
                                 <li>• Job matching based on experience</li>
                                 <li>• Skill gap analysis and upskilling paths</li>
@@ -243,17 +319,18 @@ export default function AboutPage() {
                         </div>
 
                         {/* Career Changers */}
-                        <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-8 border border-purple-100 hover:shadow-xl transition-all hover:-translate-y-1">
-                            <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mb-6">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
+                        <div
+                            className="rounded-2xl shadow-xl backdrop-blur-md bg-white/70 dark:bg-slate-950/60 border border-gray-200 dark:border-white/10 transition-all duration-300 spotlight-card accent-border-cyan rounded-2xl p-8 relative"
+                            onMouseMove={handleMouseMove}
+                        >
+                            <div className="w-14 h-14 bg-cyan-500/20 border border-cyan-500/30 rounded-xl flex items-center justify-center mb-5">
+                                <Zap className="w-7 h-7 text-cyan-400" />
                             </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-3">Career Changers</h3>
-                            <p className="text-gray-600 mb-4">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Career Changers</h3>
+                            <p className="text-gray-600 dark:text-slate-400 mb-5 text-sm leading-relaxed">
                                 Transition into a new field by highlighting transferable skills, identifying relevant opportunities, and building a compelling narrative.
                             </p>
-                            <ul className="space-y-2 text-sm text-gray-700">
+                            <ul className="space-y-2 text-sm text-gray-600 dark:text-slate-300">
                                 <li>• Transferable skills identification</li>
                                 <li>• Industry transition guidance</li>
                                 <li>• Re-branding and positioning support</li>
@@ -263,61 +340,70 @@ export default function AboutPage() {
                 </div>
             </section>
 
+            {/* Section Divider */}
+            <div className="section-divider max-w-6xl mx-auto" />
 
-            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-linear-to-r from-blue-600 to-indigo-600">
-                <div className="max-w-5xl mx-auto">
-                    <h2 className="text-3xl sm:text-4xl font-bold text-center text-white mb-4">
-                        Your Career Journey with CareerCraft
+            {/* ===== CAREER JOURNEY TIMELINE ===== */}
+            <section className="py-20 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-4xl mx-auto">
+                    <h2 className="heading-lg text-center mb-4">
+                        <span className="text-gray-900 dark:text-white">Your Career Journey with </span>
+                        <span className="gradient-text">CareerCraft</span>
                     </h2>
-                    <p className="text-center text-blue-100 text-lg mb-12">
+                    <p className="text-center text-gray-600 dark:text-slate-400 text-lg mb-16">
                         From resume building to landing your dream job
                     </p>
 
-                    <div className="space-y-8">
-                        {/* Timeline Item 1 */}
-                        <div className="flex gap-6 items-start group">
-                            <div className="shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold shadow-lg">
-                                1
-                            </div>
-                            <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-                                <h4 className="text-xl font-bold text-white mb-2">Upload Your Resume</h4>
-                                <p className="text-blue-100">
+                    <div className="timeline-container relative" ref={timelineRef}>
+                        {/* Background Line */}
+                        <div className="timeline-line bg-gray-200 dark:bg-blue-900/20" />
+                        {/* Progress Line */}
+                        <div
+                            className="timeline-line-progress"
+                            style={{ height: `${scrollProgress}%` }}
+                        />
+
+                        <div className="space-y-12 pl-16 sm:pl-20">
+                            {/* Step 1 */}
+                            <div className="timeline-item relative">
+                                <div className="absolute -left-16 sm:-left-20 w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white font-bold text-lg shadow-lg shadow-blue-500/25">
+                                    1
+                                </div>
+                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Upload Your Resume</h4>
+                                <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                     Start by uploading your existing resume. Our AI analyzes it instantly.
                                 </p>
                             </div>
-                        </div>
 
-                        <div className="flex gap-6 items-start group">
-                            <div className="shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold shadow-lg">
-                                2
-                            </div>
-                            <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-                                <h4 className="text-xl font-bold text-white mb-2">Get Personalized Insights</h4>
-                                <p className="text-blue-100">
+                            {/* Step 2 */}
+                            <div className="timeline-item relative">
+                                <div className="absolute -left-16 sm:-left-20 w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white font-bold text-lg shadow-lg shadow-violet-500/25">
+                                    2
+                                </div>
+                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Get Personalized Insights</h4>
+                                <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                     Receive detailed feedback on strengths, weaknesses, and improvement areas.
                                 </p>
                             </div>
-                        </div>
 
-                        <div className="flex gap-6 items-start group">
-                            <div className="shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold shadow-lg">
-                                3
-                            </div>
-                            <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-                                <h4 className="text-xl font-bold text-white mb-2">Match with Opportunities</h4>
-                                <p className="text-blue-100">
+                            {/* Step 3 */}
+                            <div className="timeline-item relative">
+                                <div className="absolute -left-16 sm:-left-20 w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white font-bold text-lg shadow-lg shadow-emerald-500/25">
+                                    3
+                                </div>
+                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Match with Opportunities</h4>
+                                <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                     Discover job roles that align perfectly with your skills and experience.
                                 </p>
                             </div>
-                        </div>
 
-                        <div className="flex gap-6 items-start group">
-                            <div className="shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold shadow-lg">
-                                4
-                            </div>
-                            <div className="flex-1 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all">
-                                <h4 className="text-xl font-bold text-white mb-2">Grow Continuously</h4>
-                                <p className="text-blue-100">
+                            {/* Step 4 */}
+                            <div className="timeline-item relative">
+                                <div className="absolute -left-16 sm:-left-20 w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center text-gray-900 dark:text-white font-bold text-lg shadow-lg shadow-orange-500/25">
+                                    4
+                                </div>
+                                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Grow Continuously</h4>
+                                <p className="text-gray-600 dark:text-slate-400 leading-relaxed">
                                     Bridge skill gaps with targeted recommendations and resources.
                                 </p>
                             </div>
@@ -326,23 +412,33 @@ export default function AboutPage() {
                 </div>
             </section>
 
-
-            <section className="py-16 px-4 sm:px-6 lg:px-8">
+            {/* ===== CTA SECTION ===== */}
+            <section className="py-20 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto">
-                    <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-2xl p-8 sm:p-12 text-center">
-                        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                            Ready to Transform Your Career?
-                        </h2>
-                        <p className="text-xl text-blue-100 mb-8">
-                            Join thousands of professionals who are building better careers with CareerCraft
-                        </p>
-                        <button className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                            Start Your Journey
-                            <ArrowRight className="w-5 h-5" />
-                        </button>
+                    <div className="relative rounded-3xl overflow-hidden">
+                        {/* Gradient Background */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 opacity-90" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+
+                        <div className="relative z-10 p-10 sm:p-16 text-center">
+                            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
+                                Ready to Transform Your Career?
+                            </h2>
+                            <p className="text-lg sm:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+                                Join thousands of professionals who are building better careers with CareerCraft
+                            </p>
+                            <button className="group inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-full font-semibold text-lg hover:bg-slate-100 transition-all duration-300 shadow-xl shadow-black/20 hover:scale-105">
+                                Start Your Journey
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
+
+            {/* Bottom spacing */}
+            <div className="h-8" />
         </div>
     );
 }
+

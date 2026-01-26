@@ -1,7 +1,6 @@
 import { apiRequest, ApiResponse } from "./api";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface User {
   _id: string;
@@ -20,7 +19,7 @@ export async function signup(
   email: string,
   password: string,
 ): Promise<ApiResponse<AuthResponse>> {
-  const response = await fetch("http://localhost:5000/api/auth/signup", {
+  const response = await fetch(`${API_BASE_URL}/auth/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

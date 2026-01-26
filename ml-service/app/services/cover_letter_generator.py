@@ -8,7 +8,7 @@ class CoverLetterGenerator:
     def __init__(
         self,
         model_name: str = "gemma2:2b",
-        ollama_url: str = "http://localhost:11434"
+        ollama_url: str = None
     ):
         self.llm_client = LLMClient(model_name, ollama_url)
         self.prompt_builder = CoverLetterPromptBuilder()

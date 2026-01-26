@@ -17,7 +17,7 @@ const getServerBaseUrl = (req) => {
 };
 
 const getFrontendBaseUrl = () => {
-  return (process.env.CLIENT_URL || "http://localhost:3000").replace(/\/$/, "");
+  return process.env.CLIENT_URL.replace(/\/$/, "");
 };
 
 const getSafeRedirectUrl = (redirect) => {

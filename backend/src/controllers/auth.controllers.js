@@ -5,50 +5,35 @@ import User from "../models/user.model.js";
 import generateToken from "../utils/jwt.js";
 
 const signup = asyncHandler(async (req, res) => {
-  console.log('🚀 SIGNUP CONTROLLER HIT');
-  console.log('📝 Request body:', req.body);
-  
   try {
     const { username, email, password } = req.body;
-    console.log('📋 Extracted fields:', { username, email, password: password ? '***' : 'undefined' });
 
     if ([username, email, password].some((field) => field?.trim() === "")) {
-      console.log('❌ Validation failed: Empty fields');
       throw new ApiError(400, "All fields are required");
     }
 
-    console.log('🔍 Checking for existing user...');
     const existedUser = await User.findOne({
       $or: [{ email }],
     });
-    console.log('👤 Existing user result:', existedUser);
     
     if (existedUser) {
-      console.log('❌ User already exists');
       throw new ApiError(409, "User with email or username already exists");
     }
 
-    console.log('👤 Creating new user...');
     const newUser = await User.create({
       username,
       email,
       password,
     });
-    console.log('✅ New user created:', newUser);
 
     const createdUser = await User.findById(newUser._id).select("-password");
-    console.log('👤 User fetched without password:', createdUser);
 
     if (!createdUser) {
-      console.log('❌ Failed to fetch created user');
       throw new ApiError(500, "Something went wrong while registering the user");
     }
     
-    console.log('🔑 Generating JWT token...');
     const jwtToken = generateToken(createdUser);
-    console.log('✅ JWT token generated');
     
-    console.log('📤 Sending success response...');
     return res
       .status(201)
       .json(
@@ -59,8 +44,6 @@ const signup = asyncHandler(async (req, res) => {
         ),
       );
   } catch (error) {
-    console.error('❌ SIGNUP ERROR:', error);
-    console.error('❌ Error stack:', error.stack);
     return res.status(500).json({
       success: false,
       message: error.message || "Server error"

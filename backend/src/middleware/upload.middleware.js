@@ -15,17 +15,14 @@ const storage = memoryStorage();
 
 // file filter - allow PDF/DOC/DOCX only
 const fileFilter = (_, file, cb) => {
-  console.log(' File filter checking:', file.mimetype);
   const allowed = [
     'application/pdf',
     'application/msword', // .doc
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
   ];
   if (allowed.includes(file.mimetype)) {
-    console.log(' File type allowed:', file.mimetype);
     cb(null, true);
   } else {
-    console.log(' File type not allowed:', file.mimetype);
     cb(new Error('Only PDF and MS Word files are allowed.'), false);
   }
 };
@@ -41,8 +38,6 @@ const upload = multer({
 
 // Direct Cloudinary upload function
 export const uploadToCloudinary = async (file) => {
-  console.log(' Starting direct Cloudinary upload for:', file.originalname);
-
   try {
     // Convert buffer to base64 for Cloudinary upload
     const base64String = file.buffer.toString('base64');
@@ -70,10 +65,8 @@ export const uploadToCloudinary = async (file) => {
       type: 'upload',         // Ensure public delivery type
     });
 
-    console.log(' Cloudinary upload successful:', result);
     return result;
   } catch (error) {
-    console.error(' Cloudinary upload error:', error);
     throw error;
   }
 };

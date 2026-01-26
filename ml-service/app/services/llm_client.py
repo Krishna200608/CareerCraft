@@ -1,5 +1,6 @@
 import requests
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +14,10 @@ class LLMClient:
     def __init__(
         self,
         model_name: str = "gemma2:2b",
-        base_url: str = "http://localhost:11434",
+        base_url: str = None,
     ):
         self.model_name = model_name
-        self.base_url = base_url.rstrip("/")
+        self.base_url = (base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")).rstrip("/")
         self.generate_url = f"{self.base_url}/api/generate"
 
     # -----------------------------------------------------

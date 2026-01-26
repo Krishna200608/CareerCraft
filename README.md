@@ -93,37 +93,156 @@ Frontend → Backend → ML Service → Backend → Frontend
 
 ## ⚙️ Setup & Installation
 
-### 1️⃣ Clone the Repository
+### 🐳 Docker Setup (Recommended)
+
+#### Prerequisites
+- Docker and Docker Compose installed on your system
+- Git
+
+#### Quick Start with Docker
+
+1. **Clone the Repository**
 ```bash
 git clone https://github.com/your-username/CareerCraft.git
 cd CareerCraft
 ```
 
-2️⃣ Start ML Service
+2. **Configure Environment Variables**
+```bash
+# Copy the example environment file
+cp .env.example .env
 
+# Edit the .env file with your configuration
+# Required: Cloudinary credentials, JWT secret
+# Optional: Google/GitHub OAuth credentials
+```
+
+3. **Start All Services**
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Or run in detached mode
+docker-compose up --build -d
+```
+
+4. **Access the Application**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+- ML Service: http://localhost:8001
+- MongoDB: localhost:27017
+
+5. **Stop Services**
+```bash
+docker-compose down
+```
+
+#### Docker Commands
+
+```bash
+# View logs for all services
+docker-compose logs -f
+
+# View logs for specific service
+docker-compose logs -f frontend
+docker-compose logs -f backend
+docker-compose logs -f ml-service
+
+# Rebuild a specific service
+docker-compose up --build backend
+
+# Stop and remove all containers
+docker-compose down -v
+```
+
+### 🛠️ Manual Setup (Without Docker)
+
+#### Prerequisites
+- Node.js (v18+)
+- Python (v3.11+)
+- MongoDB
+- Git
+
+#### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/your-username/CareerCraft.git
+cd CareerCraft
+```
+
+#### 2️⃣ Start ML Service
 ```bash
 cd ml-service
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8001
+uvicorn app.main:app --reload --port 8001
 ```
 
-3️⃣ Start Backend
-
+#### 3️⃣ Start Backend
 ```bash
 cd backend
 npm install
+cp .env.production .env  # Configure with your credentials
 npm run dev
 ```
 
-4️⃣ Start Frontend
-
+#### 4️⃣ Start Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
+---
+
+## 🔧 Environment Variables
+
+### Required Variables
+- `MONGODB_URI`: MongoDB connection string
+- `CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name
+- `CLOUDINARY_API_KEY`: Cloudinary API key
+- `CLOUDINARY_API_SECRET`: Cloudinary API secret
+- `JWT_SECRET`: Secret for JWT token signing
+
+### Optional Variables
+- `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET`: Google OAuth
+- `GITHUB_CLIENT_ID` & `GITHUB_CLIENT_SECRET`: GitHub OAuth
+- `OLLAMA_BASE_URL`: Ollama service URL (default: http://localhost:11434)
+
+### Service URLs
+- Frontend: http://localhost:3000
+- Backend: http://localhost:5000
+- ML Service: http://localhost:8001
+- MongoDB: localhost:27017
+
+---
+
+## 📝 Docker Development Notes
+
+### Service Architecture
+- **frontend**: Next.js application (Port 3000)
+- **backend**: Node.js/Express API (Port 5000)
+- **ml-service**: Python/FastAPI ML service (Port 8001)
+- **mongodb**: MongoDB database (Port 27017)
+
+### Volume Mounts
+- Source code is mounted for live development
+- Node modules are isolated to prevent conflicts
+- MongoDB data persists in Docker volume
+
+### Health Checks
+All services include health checks for monitoring:
+- Backend: HTTP check on `/api/health`
+- ML Service: HTTP check on `/`
+- Frontend: Process monitoring
+
+### Production Deployment
+For production deployment:
+1. Update environment variables with production values
+2. Remove volume mounts for source code
+3. Use proper secrets management
+4. Configure reverse proxy (nginx/traefik)
+5. Set up SSL certificates
 
 ---
 

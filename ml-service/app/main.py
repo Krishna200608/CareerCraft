@@ -5,11 +5,10 @@ from app.api import resume,health,cover_letter
 
 app = FastAPI(title = "CareerCraft ML Service")
 
-allowed_origins = os.getenv("CORS_ALLOW_ORIGINS", "").split(",") if os.getenv("CORS_ALLOW_ORIGINS") else []
-
+# Allow all origins for local development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in allowed_origins if origin.strip()],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

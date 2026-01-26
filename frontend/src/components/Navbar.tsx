@@ -81,7 +81,7 @@ export default function Navbar() {
               Resume Analysis
             </Link>
             <Link href="/resume-upload" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
-              Upload Resume
+              My Resumes
             </Link>
             <Link href="/cover-letter" className="text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white">
               Get Cover Letter

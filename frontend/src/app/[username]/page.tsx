@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { isAuthenticated, getCurrentUser } from '@/lib/auth';
 import { getProfile, updateProfile, ProfileData, UpdateProfileRequest } from '@/lib/profileApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faDownload, faTrash, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import ResumeCard from '@/components/ResumeCard';
 import CoverLetterCard from '@/components/CoverLetterCard';
 import { SavedCoverLetter, deleteCoverLetter } from '@/lib/coverLetterApi';
@@ -78,8 +78,8 @@ export default function ProfilePage() {
                     return;
                 }
 
-                // Fetch profile data
-                const data = await getProfile(username);
+                // Fetch profile data with limit 3 (for recent items)
+                const data = await getProfile(username, 3);
                 setProfileData(data);
 
                 // Initialize form with profile data
@@ -283,7 +283,7 @@ export default function ProfilePage() {
         );
     }
 
-    const { profile, resumes, coverLetters } = profileData;
+    const { profile, resumes, coverLetters, resumeCount, coverLetterCount } = profileData;
 
     return (
         <>
@@ -552,7 +552,14 @@ export default function ProfilePage() {
 
                     {/* Resumes Section */}
                     <div className="mb-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-                        <h2 className="text-xl font-semibold mb-4 text-zinc-900 dark:text-white">My Resumes ({resumes.length})</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Recent Resumes</h2>
+                            {resumeCount > 3 && (
+                                <Link href="/resume-upload" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                                    View All ({resumeCount}) →
+                                </Link>
+                            )}
+                        </div>
                         {resumes.length === 0 ? (
                             <div className="text-center py-8">
                                 <p className="text-zinc-500 dark:text-zinc-400 mb-4">No resumes uploaded yet.</p>
@@ -571,11 +578,25 @@ export default function ProfilePage() {
                                 ))}
                             </div>
                         )}
+                        {resumes.length > 0 && resumeCount <= 3 && (
+                            <div className="mt-4 text-center">
+                                <Link href="/resume-upload" className="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300">
+                                    Manage Resumes →
+                                </Link>
+                            </div>
+                        )}
                     </div>
 
                     {/* Cover Letters Section */}
                     <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-                        <h2 className="text-xl font-semibold mb-4 text-zinc-900 dark:text-white">My Cover Letters ({coverLetters.length})</h2>
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">Recent Cover Letters</h2>
+                            {coverLetterCount > 3 && (
+                                <Link href="/my-cover-letters" className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                                    View All ({coverLetterCount}) →
+                                </Link>
+                            )}
+                        </div>
                         {coverLetters.length === 0 ? (
                             <div className="text-center py-8">
                                 <p className="text-zinc-500 dark:text-zinc-400 mb-4">No cover letters saved yet.</p>
@@ -585,7 +606,7 @@ export default function ProfilePage() {
                             </div>
                         ) : (
                             <div className="grid gap-6 md:grid-cols-2">
-                                {coverLetters.slice(0, 4).map((cl) => (
+                                {coverLetters.map((cl) => (
                                     <CoverLetterCard
                                         key={cl._id}
                                         letter={cl}
@@ -595,10 +616,10 @@ export default function ProfilePage() {
                                 ))}
                             </div>
                         )}
-                        {coverLetters.length > 0 && (
+                        {coverLetters.length > 0 && coverLetterCount <= 3 && (
                             <div className="mt-4 text-center">
-                                <Link href="/my-cover-letters" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                                    View all cover letters →
+                                <Link href="/my-cover-letters" className="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300">
+                                    Manage Cover Letters →
                                 </Link>
                             </div>
                         )}

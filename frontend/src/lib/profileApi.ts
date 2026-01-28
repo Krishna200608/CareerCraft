@@ -33,6 +33,8 @@ export interface ProfileData {
     profile: UserProfile;
     resumes: Resume[];
     coverLetters: SavedCoverLetter[];
+    resumeCount: number;
+    coverLetterCount: number;
 }
 
 export interface UpdateProfileRequest {
@@ -51,14 +53,19 @@ export interface UpdateProfileRequest {
 /**
  * Get profile by username (owner only)
  */
-export async function getProfile(username: string): Promise<ProfileData> {
+export async function getProfile(username: string, limit?: number): Promise<ProfileData> {
     const token = getToken();
 
     if (!token) {
         throw new Error("You must be logged in to view profiles");
     }
 
-    const response = await fetch(`${API_BASE_URL}/profile/${username}`, {
+    // Append limit query param if provided
+    const url = limit
+        ? `${API_BASE_URL}/profile/${username}?limit=${limit}`
+        : `${API_BASE_URL}/profile/${username}`;
+
+    const response = await fetch(url, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",

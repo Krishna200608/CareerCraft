@@ -13,8 +13,13 @@ import redis from "../utils/redisClient.js";
  */
 const getProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
+  const { limit } = req.query; // Parse limit from query
   const requestingUser = req.user;
-  const dashboardCacheKey = `dashboard:${requestingUser._id}`;
+  const limitNum = limit ? parseInt(limit) : undefined;
+
+  // Cache key includes limit to avoid serving limited data for full requests
+  const dashboardCacheKey = `dashboard:${requestingUser._id}:${limitNum || "full"}`;
+
   // Try Redis cache first
   try {
     const cached = await redis.get(dashboardCacheKey);
@@ -46,20 +51,30 @@ const getProfile = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You can only view your own profile");
   }
 
-  // Get user's resumes
-  const resumes = await Resume.find({ userId: profileUser._id })
-    .sort({ createdAt: -1 })
-    .lean();
+  // Get total counts
+  const resumeCount = await Resume.countDocuments({ userId: profileUser._id });
+  const coverLetterCount = await CoverLetter.countDocuments({ userId: profileUser._id });
 
-  // Get user's cover letters
-  const coverLetters = await CoverLetter.find({ userId: profileUser._id })
-    .sort({ createdAt: -1 })
-    .lean();
+  // Get user's resumes (with limit if provided)
+  let resumeQuery = Resume.find({ userId: profileUser._id }).sort({ createdAt: -1 });
+  if (limitNum) {
+    resumeQuery = resumeQuery.limit(limitNum);
+  }
+  const resumes = await resumeQuery.lean();
+
+  // Get user's cover letters (with limit if provided)
+  let coverLetterQuery = CoverLetter.find({ userId: profileUser._id }).sort({ createdAt: -1 });
+  if (limitNum) {
+    coverLetterQuery = coverLetterQuery.limit(limitNum);
+  }
+  const coverLetters = await coverLetterQuery.lean();
 
   const payload = {
     profile: profileUser,
     resumes,
     coverLetters,
+    resumeCount,
+    coverLetterCount,
   };
   // Store in Redis cache (TTL: 5 min)
   try {

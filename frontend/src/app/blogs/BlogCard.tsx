@@ -3,7 +3,6 @@ import { Blog, BlogCategory } from "./data";
 
 interface BlogCardProps {
   blog: Blog;
-  onReadMore?: (id: string) => void;
 }
 
 const categoryColors: Record<BlogCategory, string> = {
@@ -19,9 +18,15 @@ const categoryColors: Record<BlogCategory, string> = {
     "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
 };
 
-export default function BlogCard({ blog, onReadMore }: BlogCardProps) {
+export default function BlogCard({ blog }: BlogCardProps) {
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm p-5 flex flex-col h-full transition hover:shadow-md">
+    <a
+      href={blog.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm p-5 flex flex-col h-full transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+      aria-label={`Read ${blog.title} (opens in new tab)`}
+    >
       <div className="flex items-center gap-2 mb-2">
         <span
           className={`px-2 py-0.5 rounded text-xs font-semibold ${categoryColors[blog.category]}`}
@@ -33,13 +38,9 @@ export default function BlogCard({ blog, onReadMore }: BlogCardProps) {
       <p className="text-sm text-zinc-600 dark:text-zinc-300 mb-4 line-clamp-3">
         {blog.description}
       </p>
-      <button
-        className="mt-auto self-start text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
-        onClick={() => onReadMore?.(blog.id)}
-        aria-label={`Read more about ${blog.title}`}
-      >
+      <span className="mt-auto self-start text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
         Read more
-      </button>
-    </div>
+      </span>
+    </a>
   );
 }
